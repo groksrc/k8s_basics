@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: utils
+  namespace: <your namespace>
+  labels:
+    app: utils
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: utils
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: utils
+    spec:
+      containers:
+      - image: groksrc/utils:latest
+        imagePullPolicy: Always
+        name: utils
+        resources: {}
+        stdin: true
+        tty: true
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: <your pvc name>

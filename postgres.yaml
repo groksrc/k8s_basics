@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-db
+  namespace: <your namespace name>
+  labels:
+    app: postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: postgres-db
+      labels:
+        app: postgresql
+    spec:
+      containers:
+      - name: postgres-db
+        env:
+        - name: POSTGRES_DB
+          value: postgres_dev # used to set the name of the database to create if none exists.
+        image: postgres:9.6
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data  # the path that the efs volume will be mounted inside the container
+          subPath: postgres # the folder inside the pvc where the files are located
+          name: data # the name of the volume from below
+      hostname: postgres-db  # sets the /etc/hosts name of the container (optional)
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: <name of your pvc>
+
